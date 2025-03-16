@@ -213,6 +213,16 @@ void SPN(Proceso procesos[], int n) {
     int tiempoActual = 0;
     int completados = 0;
 
+    // Matriz para almacenar el diagrama de Gantt
+    char gantt[100][100]; // Asumimos un máximo de 100 procesos y 100 unidades de tiempo
+
+    // Inicializar la matriz con espacios en blanco
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < 100; j++) {
+            gantt[i][j] = ' ';
+        }
+    }
+
     while (completados < n) {
         int idx = -1;
         int menorRafaga = 999999;
@@ -228,13 +238,14 @@ void SPN(Proceso procesos[], int n) {
         }
 
         if (idx != -1) {
-            // Registrar el tiempo de inicio justo antes de ejecutar el proceso
+            // Registrar el tiempo de inicio si es la primera vez que el proceso se ejecuta
             if (procesos[idx].inicio == 0) {
-                procesos[idx].inicio = tiempoActual + 1; // Corrección aquí
+                procesos[idx].inicio = tiempoActual;
             }
 
             // Ejecutar el proceso seleccionado por 1 unidad de tiempo
             procesos[idx].tiempoRafagaRestante--;
+            gantt[idx][tiempoActual] = '#'; // Marcar el tiempo actual en el diagrama de Gantt
             tiempoActual++;
 
             // Si el proceso ha terminado, calcular sus tiempos
@@ -249,7 +260,22 @@ void SPN(Proceso procesos[], int n) {
             tiempoActual++;
         }
     }
-    
+
+    // Mostrar la línea de tiempo
+    cout << "Tiempo:  ";
+    for (int j = 0; j < tiempoActual + 1; j++) {
+        cout << j << "  ";
+    }
+    cout << endl;
+
+    // Mostrar el diagrama de Gantt para cada proceso
+    for (int i = 0; i < n; i++) {
+        cout << "Proceso " << procesos[i].id << ": ";
+        for (int j = 0; j < tiempoActual; j++) {
+            cout << "|" << gantt[i][j] << "|";
+        }
+        cout << endl;
+    }
 }
 
 // Función para calcular el tiempo de espera y finalización en Retroalimentación (Multilevel Feedback Queue)
