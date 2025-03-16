@@ -30,9 +30,46 @@ void copiarProcesos(Proceso destino[], Proceso fuente[], int n) {
     }
 }
 
+void generarDiagramaGantt(Proceso procesos[], int n, int tiempoTotal) {
+    // Crear una matriz para almacenar el diagrama de Gantt
+    char gantt[100][100]; // Asumimos un máximo de 100 procesos y 100 unidades de tiempo
+
+    // Inicializar la matriz con espacios en blanco
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < tiempoTotal; j++) {
+            gantt[i][j] = ' ';
+        }
+    }
+
+    // Llenar la matriz con los tiempos de ejecución de cada proceso
+    for (int i = 0; i < n; i++) {
+        for (int j = procesos[i].inicio; j < procesos[i].tiempoFinalizacion; j++) {
+            gantt[i][j] = '#';
+        }
+    }
+
+    // Mostrar la línea de tiempo
+    cout << "Tiempo:  ";
+    for (int j = 0; j < tiempoTotal+1; j++) {
+        cout << j << "  ";
+    }
+    cout << endl;
+
+    // Mostrar el diagrama de Gantt para cada proceso
+    for (int i = 0; i < n; i++) {
+        cout << "Proceso " << procesos[i].id << ": ";
+        for (int j = 0; j < tiempoTotal; j++) {
+            cout << "|" << gantt[i][j] << "|";
+        }
+        cout << endl;
+    }
+}
+
 // Función para calcular el tiempo de espera y finalización en FCFS
 void FCFS(Proceso procesos[], int n) {
     int tiempoActual = 0;
+
+    // Calcular tiempos de inicio, finalización, espera y retorno
     for (int i = 0; i < n; i++) {
         if (tiempoActual < procesos[i].tiempoLlegada) {
             tiempoActual = procesos[i].tiempoLlegada;
@@ -41,8 +78,12 @@ void FCFS(Proceso procesos[], int n) {
         procesos[i].tiempoEspera = tiempoActual - procesos[i].tiempoLlegada;
         procesos[i].tiempoFinalizacion = tiempoActual + procesos[i].tiempoRafaga;
         procesos[i].tiempoRetorno = procesos[i].tiempoFinalizacion - procesos[i].tiempoLlegada;
+
         tiempoActual = procesos[i].tiempoFinalizacion;
     }
+
+    // Generar el diagrama de Gantt
+    generarDiagramaGantt(procesos, n, tiempoActual);
 }
 
 // Función para calcular el tiempo de espera y finalización en SPF (No expropiativo)
