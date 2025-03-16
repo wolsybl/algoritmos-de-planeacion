@@ -279,7 +279,7 @@ void SPN(Proceso procesos[], int n) {
 }
 
 // Función para calcular el tiempo de espera y finalización en Retroalimentación (Multilevel Feedback Queue)
-void Retroalimentacion(Proceso procesos[], int n) {
+void Realimentacion(Proceso procesos[], int n) {
     int tiempoActual = 0;
     int completados = 0;
     int tiemposRafagaRestantes[n];
@@ -368,7 +368,7 @@ int main() {
             cout << "3. HRRN (No Expropiativo)\n";
             cout << "4. Round Robin (Expropiativo)\n";
             cout << "5. SPN (No Expropiativo)\n";
-            cout << "6. Retroalimentacion (Expropiativo)\n";
+            cout << "6. Realimentacion (Expropiativo)\n";
             cin >> opcion;
 
             switch (opcion) {
@@ -388,7 +388,7 @@ int main() {
                     SPN(procesos, n);
                     break;
                 case 6:
-                    Retroalimentacion(procesos, n);
+                    Realimentacion(procesos, n);
                     break;
                 default:
                     cout << "Opcion no valida.\n";
