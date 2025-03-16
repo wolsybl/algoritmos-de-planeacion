@@ -132,6 +132,8 @@ void SPF(Proceso procesos[], int n) {
             tiempoActual = procesos[i].tiempoFinalizacion;
         }
     }
+    // Generar el diagrama de Gantt
+    generarDiagramaGantt(procesos, n, tiempoActual);
 }
 
 // Función para calcular el tiempo de espera y finalización en HRRN
@@ -160,6 +162,8 @@ void HRRN(Proceso procesos[], int n) {
             i--;
         }
     }
+    // Generar el diagrama de Gantt
+    generarDiagramaGantt(procesos, n, tiempoActual);
 }
 
 // Función para calcular el tiempo de espera y finalización en Round Robin
@@ -245,6 +249,7 @@ void SPN(Proceso procesos[], int n) {
             tiempoActual++;
         }
     }
+    
 }
 
 // Función para calcular el tiempo de espera y finalización en Retroalimentación (Multilevel Feedback Queue)
