@@ -10,9 +10,12 @@ struct Proceso {
     int tiempoRetorno;
     int inicio; // Tiempo en el que comenzó a ejecutarse
     int tiempoRafagaRestante; // Para algoritmos expropiativos
+    int colaPrioridad[100]; // Arreglo para almacenar las prioridades
+    int numPrioridades; // Numero de prioridades almacenadas
+    int colaProcesos[100];		//Contador de procesos para validar si se baja la prioridad
 };
 
-// Función para reiniciar los valores de los procesos
+// Funcion para reiniciar los valores de los procesos
 void reiniciarProcesos(Proceso procesos[], int n) {
     for (int i = 0; i < n; i++) {
         procesos[i].tiempoEspera = 0;
@@ -312,45 +315,156 @@ void SPN(Proceso procesos[], int n) {
     }
 }
 
+// Función para ajustar el heap hacia abajo (heapify)
+void heapify(Proceso procesos[], int heap[], int n, int i) {
+    int smallest = i; // Inicializar el más pequeño como la raíz
+    int left = 2 * i + 1; // Índice del hijo izquierdo
+    int right = 2 * i + 2; // Índice del hijo derecho
+
+    // Si el hijo izquierdo es más pequeño que la raíz
+    if (left < n && procesos[heap[left]].numPrioridades < procesos[heap[smallest]].numPrioridades) {
+        smallest = left;
+    }
+
+    // Si el hijo derecho es más pequeño que el más pequeño hasta ahora
+    if (right < n && procesos[heap[right]].numPrioridades < procesos[heap[smallest]].numPrioridades) {
+        smallest = right;
+    }
+
+    // Si el más pequeño no es la raíz
+    if (smallest != i) {
+        std::swap(heap[i], heap[smallest]); // Intercambiar
+        heapify(procesos, heap, n, smallest); // Ajustar recursivamente el subárbol afectado
+    }
+}
+
+// Función para construir el heap
+void buildHeap(Proceso procesos[], int heap[], int n) {
+    // Índice del último nodo no hoja
+    int startIdx = (n / 2) - 1;
+
+    // Ajustar cada nodo no hoja
+    for (int i = startIdx; i >= 0; i--) {
+        heapify(procesos, heap, n, i);
+    }
+}
+
+// Función para extraer el proceso con la menor prioridad
+int extractMin(Proceso procesos[], int heap[], int &n) {
+    if (n <= 0) return -1; // Heap vacío
+
+    int minIdx = heap[0]; // El proceso con la menor prioridad está en la raíz
+    heap[0] = heap[n - 1]; // Mover el último elemento a la raíz
+    n--; // Reducir el tamaño del heap
+    heapify(procesos, heap, n, 0); // Ajustar el heap
+
+    return minIdx;
+}
+
 // Función para calcular el tiempo de espera y finalización en Retroalimentación (Multilevel Feedback Queue)
 void Realimentacion(Proceso procesos[], int n) {
     int tiempoActual = 0;
     int completados = 0;
-    int tiemposRafagaRestantes[n];
-    bool procesoIniciado[n]; // Para registrar si el proceso ya ha comenzado
+    int tiemposRafagaRestantes[n]; // Tiempo de ráfaga restante para cada proceso
+    bool procesoIniciado[n];      // Indica si un proceso ya ha comenzado a ejecutarse
+    int contadorInicios = 0;      // Contador de inicios de procesos
+
+    // Inicializar los tiempos de ráfaga restantes y el estado de inicio de los procesos
     for (int i = 0; i < n; i++) {
         tiemposRafagaRestantes[i] = procesos[i].tiempoRafaga;
-        procesoIniciado[i] = false; // Inicialmente, ningún proceso ha comenzado
+        procesoIniciado[i] = false; // Ningún proceso ha comenzado
+        procesos[i].numPrioridades = 0; // Inicializar el contador de prioridades
     }
 
+    // Crear una matriz para el diagrama de Gantt
+    const int maxTiempo = 100; // Máximo tiempo asumido
+    char gantt[n][maxTiempo];  // Matriz para el diagrama de Gantt
+
+    // Inicializar la matriz con espacios en blanco
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < maxTiempo; j++) {
+            gantt[i][j] = ' ';
+        }
+    }
+
+    // Bucle principal: ejecutar hasta que todos los procesos hayan terminado
     while (completados < n) {
         bool procesoEjecutado = false;
+
+        // Incrementar el contador de inicios si un proceso alcanza su tiempo de inicio
+        for (int i = 0; i < n; i++) {
+            if (procesos[i].tiempoLlegada == tiempoActual && !procesoIniciado[i]) {
+                contadorInicios++;
+                procesoIniciado[i] = true;
+                cout << "Contador de inicios aumentó a: " << contadorInicios << endl;
+            }
+        }
+
+        // Buscar el proceso listo con el menor número de prioridades
+        int idx = -1; // Índice del proceso seleccionado
+        int minPrioridades = 999999; // Mínimo número de prioridades
+
         for (int i = 0; i < n; i++) {
             if (procesos[i].tiempoLlegada <= tiempoActual && tiemposRafagaRestantes[i] > 0) {
-                procesoEjecutado = true;
-
-                // Registrar el inicio si es la primera vez que el proceso se ejecuta
-                if (!procesoIniciado[i]) {
-                    procesos[i].inicio = tiempoActual;
-                    procesoIniciado[i] = true;
-                }
-
-                // Ejecutar el proceso por un quantum de 1
-                int tiempoEjecucion = min(1, tiemposRafagaRestantes[i]);
-                tiemposRafagaRestantes[i] -= tiempoEjecucion;
-                tiempoActual += tiempoEjecucion;
-
-                if (tiemposRafagaRestantes[i] == 0) {
-                    completados++;
-                    procesos[i].tiempoFinalizacion = tiempoActual;
-                    procesos[i].tiempoEspera = procesos[i].tiempoFinalizacion - procesos[i].tiempoLlegada - procesos[i].tiempoRafaga;
-                    procesos[i].tiempoRetorno = procesos[i].tiempoFinalizacion - procesos[i].tiempoLlegada;
+                if (procesos[i].numPrioridades < minPrioridades) {
+                    minPrioridades = procesos[i].numPrioridades;
+                    idx = i;
                 }
             }
         }
+
+        // Si se encontró un proceso listo, ejecutarlo
+        if (idx != -1) {
+            procesoEjecutado = true;
+
+            // Incrementar el número de prioridades del proceso seleccionado
+            procesos[idx].numPrioridades++;
+            cout << "Proceso " << procesos[idx].id << " tiene ahora " << procesos[idx].numPrioridades << " prioridades." << endl;
+
+            // Ejecutar el proceso por un quantum de 1 unidad de tiempo
+            tiemposRafagaRestantes[idx]--;
+            gantt[idx][tiempoActual] = '#'; // Marcar en el diagrama de Gantt
+            tiempoActual++;
+
+            // Si el proceso ha terminado, calcular sus tiempos
+            if (tiemposRafagaRestantes[idx] == 0) {
+                completados++;
+                procesos[idx].tiempoFinalizacion = tiempoActual;
+                procesos[idx].tiempoRetorno = procesos[idx].tiempoFinalizacion - procesos[idx].tiempoLlegada;
+                procesos[idx].tiempoEspera = procesos[idx].tiempoFinalizacion - procesos[idx].tiempoLlegada - procesos[idx].tiempoRafaga;
+            }
+        }
+
+        // Si no se ejecutó ningún proceso en este ciclo, avanzar el tiempo
         if (!procesoEjecutado) {
             tiempoActual++;
         }
+    }
+
+    // Imprimir el diagrama de Gantt
+    cout << "Diagrama de Gantt (Realimentacion):" << endl;
+    cout << "Tiempo:  ";
+    for (int j = 0; j < tiempoActual; j++) {
+        cout << j << "  ";
+    }
+    cout << endl;
+
+    for (int i = 0; i < n; i++) {
+        cout << "Proceso " << procesos[i].id << ": ";
+        for (int j = 0; j < tiempoActual; j++) {
+            cout << "|" << gantt[i][j] << "|";
+        }
+        cout << endl;
+    }
+
+    // Imprimir la cola de prioridad de cada proceso
+    cout << "\nCola de prioridad de cada proceso:" << endl;
+    for (int i = 0; i < n; i++) {
+        cout << "Proceso " << procesos[i].id << ": ";
+        for (int j = 0; j < procesos[i].numPrioridades; j++) {
+            cout << procesos[i].colaPrioridad[j] << " ";
+        }
+        cout << endl;
     }
 }
 
