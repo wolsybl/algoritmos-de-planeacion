@@ -12,9 +12,8 @@ struct Proceso {
     int tiempoRafagaRestante; // Para algoritmos expropiativos
     int colaPrioridad[100]; // Arreglo para almacenar las prioridades
     int numPrioridades; // Numero de prioridades almacenadas
-    int colaProcesos[100];		//Contador de procesos para validar si se baja la prioridad
+    int colaProcesos[100]; // Contador de procesos para validar si se baja la prioridad
 };
-
 // Funcion para reiniciar los valores de los procesos
 void reiniciarProcesos(Proceso procesos[], int n) {
     for (int i = 0; i < n; i++) {
@@ -315,51 +314,6 @@ void SPN(Proceso procesos[], int n) {
     }
 }
 
-// Función para ajustar el heap hacia abajo (heapify)
-void heapify(Proceso procesos[], int heap[], int n, int i) {
-    int smallest = i; // Inicializar el más pequeño como la raíz
-    int left = 2 * i + 1; // Índice del hijo izquierdo
-    int right = 2 * i + 2; // Índice del hijo derecho
-
-    // Si el hijo izquierdo es más pequeño que la raíz
-    if (left < n && procesos[heap[left]].numPrioridades < procesos[heap[smallest]].numPrioridades) {
-        smallest = left;
-    }
-
-    // Si el hijo derecho es más pequeño que el más pequeño hasta ahora
-    if (right < n && procesos[heap[right]].numPrioridades < procesos[heap[smallest]].numPrioridades) {
-        smallest = right;
-    }
-
-    // Si el más pequeño no es la raíz
-    if (smallest != i) {
-        std::swap(heap[i], heap[smallest]); // Intercambiar
-        heapify(procesos, heap, n, smallest); // Ajustar recursivamente el subárbol afectado
-    }
-}
-
-// Función para construir el heap
-void buildHeap(Proceso procesos[], int heap[], int n) {
-    // Índice del último nodo no hoja
-    int startIdx = (n / 2) - 1;
-
-    // Ajustar cada nodo no hoja
-    for (int i = startIdx; i >= 0; i--) {
-        heapify(procesos, heap, n, i);
-    }
-}
-
-// Función para extraer el proceso con la menor prioridad
-int extractMin(Proceso procesos[], int heap[], int &n) {
-    if (n <= 0) return -1; // Heap vacío
-
-    int minIdx = heap[0]; // El proceso con la menor prioridad está en la raíz
-    heap[0] = heap[n - 1]; // Mover el último elemento a la raíz
-    n--; // Reducir el tamaño del heap
-    heapify(procesos, heap, n, 0); // Ajustar el heap
-
-    return minIdx;
-}
 
 // Función para calcular el tiempo de espera y finalización en Retroalimentación (Multilevel Feedback Queue)
 void Realimentacion(Proceso procesos[], int n) {
@@ -400,9 +354,9 @@ void Realimentacion(Proceso procesos[], int n) {
             }
         }
 
-        // Buscar el proceso listo con el menor número de prioridades
-        int idx = -1; // Índice del proceso seleccionado
-        int minPrioridades = 999999; // Mínimo número de prioridades
+        // Buscar el proceso listo con el menor numero de prioridades
+        int idx = -1; // indice del proceso seleccionado
+        int minPrioridades = 999999; // Minimo numero de prioridades
 
         for (int i = 0; i < n; i++) {
             if (procesos[i].tiempoLlegada <= tiempoActual && tiemposRafagaRestantes[i] > 0) {
@@ -417,10 +371,21 @@ void Realimentacion(Proceso procesos[], int n) {
         if (idx != -1) {
             procesoEjecutado = true;
 
-            // Incrementar el número de prioridades del proceso seleccionado
-            procesos[idx].numPrioridades++;
-            cout << "Proceso " << procesos[idx].id << " tiene ahora " << procesos[idx].numPrioridades << " prioridades." << endl;
+            // Verificar cuántos procesos están listos para ejecutarse
+            int procesosListos = 0;
+            for (int i = 0; i < n; i++) {
+                if (procesos[i].tiempoLlegada < tiempoActual && tiemposRafagaRestantes[i] > 0) {
+                    procesosListos++;
+                }
+            }
 
+            // Incrementar el número de prioridades solo si hay más de un proceso listo
+            if (procesosListos < contadorInicios) {
+                procesos[idx].numPrioridades++;
+                cout << "Proceso " << procesos[idx].id << " tiene ahora " << procesos[idx].numPrioridades << " prioridades." << endl;
+            }
+            
+            
             // Ejecutar el proceso por un quantum de 1 unidad de tiempo
             tiemposRafagaRestantes[idx]--;
             gantt[idx][tiempoActual] = '#'; // Marcar en el diagrama de Gantt
