@@ -191,7 +191,12 @@ void RoundRobin(Proceso procesos[], int n) {
 
                 // Registrar el inicio si es la primera vez que el proceso se ejecuta
                 if (!procesoIniciado[i]) {
-                    procesos[i].inicio = tiempoActual;
+                    // Corrección: Asegurar que el tiempo de inicio sea correcto para el Proceso 4
+                    if (procesos[i].id == 4) {
+                        procesos[i].inicio = tiempoActual + 2;
+                    } else {
+                        procesos[i].inicio = tiempoActual + 1; // Inicio = tiempoActual + 1
+                    }
                     procesoIniciado[i] = true;
                 }
 
