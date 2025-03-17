@@ -350,6 +350,7 @@ void Realimentacion(Proceso procesos[], int n) {
             if (procesos[i].tiempoLlegada == tiempoActual && !procesoIniciado[i]) {
                 contadorInicios++;
                 procesoIniciado[i] = true;
+                procesos[i].inicio = tiempoActual + 1;
                 cout << "Contador de inicios aumentó a: " << contadorInicios << endl;
             }
         }
