@@ -172,6 +172,16 @@ void RoundRobin(Proceso procesos[], int n) {
     int completados = 0;
     int tiemposRafagaRestantes[n]; // Tiempo de ráfaga restante para cada proceso
     bool procesoIniciado[n];      // Indica si un proceso ya ha comenzado a ejecutarse
+    
+    // Matriz para almacenar el diagrama de Gantt
+    char gantt[100][100]; // Asumimos un máximo de 100 procesos y 100 unidades de tiempo
+
+    // Inicializar la matriz con espacios en blanco
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < 100; j++) {
+            gantt[i][j] = ' ';
+        }
+    }
 
     // Inicializar los tiempos de ráfaga restantes y el estado de inicio de los procesos
     for (int i = 0; i < n; i++) {
@@ -191,17 +201,13 @@ void RoundRobin(Proceso procesos[], int n) {
 
                 // Registrar el inicio si es la primera vez que el proceso se ejecuta
                 if (!procesoIniciado[i]) {
-                    // Corrección: Asegurar que el tiempo de inicio sea correcto para el Proceso 4
-                    if (procesos[i].id == 4) {
-                        procesos[i].inicio = tiempoActual + 2;
-                    } else {
-                        procesos[i].inicio = tiempoActual + 1; // Inicio = tiempoActual + 1
-                    }
+                	procesos[i].inicio = tiempoActual + 1;
                     procesoIniciado[i] = true;
                 }
 
                 // Ejecutar el proceso por un quantum de 1 unidad de tiempo
                 tiemposRafagaRestantes[i]--;
+                gantt[i][tiempoActual] = '#'; // Marcar el tiempo actual en el diagrama de Gantt
                 tiempoActual++;
 
                 // Si el proceso ha terminado, calcular sus tiempos
@@ -218,6 +224,21 @@ void RoundRobin(Proceso procesos[], int n) {
         if (!procesoEjecutado) {
             tiempoActual++;
         }
+    }
+    // Mostrar la línea de tiempo
+    cout << "Tiempo:  ";
+    for (int j = 0; j < tiempoActual + 1; j++) {
+        cout << j << "  ";
+    }
+    cout << endl;
+
+    // Mostrar el diagrama de Gantt para cada proceso
+    for (int i = 0; i < n; i++) {
+        cout << "Proceso " << procesos[i].id << ": ";
+        for (int j = 0; j < tiempoActual; j++) {
+            cout << "|" << gantt[i][j] << "|";
+        }
+        cout << endl;
     }
 }
 
