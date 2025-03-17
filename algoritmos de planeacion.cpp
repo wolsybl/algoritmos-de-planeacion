@@ -43,14 +43,14 @@ void generarDiagramaGantt(Proceso procesos[], int n, int tiempoTotal) {
         }
     }
 
-    // Llenar la matriz con los tiempos de ejecución de cada proceso
+    // Llenar la matriz con los tiempos de ejecucion de cada proceso
     for (int i = 0; i < n; i++) {
         for (int j = procesos[i].inicio; j < procesos[i].tiempoFinalizacion; j++) {
             gantt[i][j] = '#';
         }
     }
 
-    // Mostrar la línea de tiempo
+    // Mostrar la linea de tiempo
     cout << "Tiempo:  ";
     for (int j = 0; j < tiempoTotal+1; j++) {
         cout << j << "  ";
@@ -67,11 +67,11 @@ void generarDiagramaGantt(Proceso procesos[], int n, int tiempoTotal) {
     }
 }
 
-// Función para calcular el tiempo de espera y finalización en FCFS
+// Funcion para calcular el tiempo de espera y finalizacion en FCFS
 void FCFS(Proceso procesos[], int n) {
     int tiempoActual = 0;
 
-    // Calcular tiempos de inicio, finalización, espera y retorno
+    // Calcular tiempos de inicio, finalizacion, espera y retorno
     for (int i = 0; i < n; i++) {
         if (tiempoActual < procesos[i].tiempoLlegada) {
             tiempoActual = procesos[i].tiempoLlegada;
@@ -88,7 +88,7 @@ void FCFS(Proceso procesos[], int n) {
     generarDiagramaGantt(procesos, n, tiempoActual);
 }
 
-// Función para calcular el tiempo de espera y finalización en SPF (No expropiativo)
+// Funcion para calcular el tiempo de espera y finalizacion en SPF (No expropiativo)
 void SPF(Proceso procesos[], int n) {
     // Ordenar por tiempo de llegada (burbuja)
     for (int i = 0; i < n - 1; i++) {
@@ -105,7 +105,7 @@ void SPF(Proceso procesos[], int n) {
     int tiempoActual = 0;
     for (int i = 0; i < n; i++) {
         int idx = -1;
-        int menorRafaga = 999999; // Valor grande para encontrar el mínimo
+        int menorRafaga = 999999; // Valor grande para encontrar el minimo
         for (int j = i; j < n; j++) {
             if (procesos[j].tiempoLlegada <= tiempoActual && procesos[j].tiempoRafaga < menorRafaga) {
                 menorRafaga = procesos[j].tiempoRafaga;
@@ -138,7 +138,7 @@ void SPF(Proceso procesos[], int n) {
     generarDiagramaGantt(procesos, n, tiempoActual);
 }
 
-// Función para calcular el tiempo de espera y finalización en HRRN
+// Funcion para calcular el tiempo de espera y finalizacion en HRRN
 void HRRN(Proceso procesos[], int n) {
     int tiempoActual = 0;
     for (int i = 0; i < n; i++) {
@@ -168,15 +168,15 @@ void HRRN(Proceso procesos[], int n) {
     generarDiagramaGantt(procesos, n, tiempoActual);
 }
 
-// Función para calcular el tiempo de espera y finalización en Round Robin
+// Funcion para calcular el tiempo de espera y finalizacion en Round Robin
 void RoundRobin(Proceso procesos[], int n) {
     int tiempoActual = 0;
     int completados = 0;
-    int tiemposRafagaRestantes[n]; // Tiempo de ráfaga restante para cada proceso
+    int tiemposRafagaRestantes[n]; // Tiempo de rafaga restante para cada proceso
     bool procesoIniciado[n];      // Indica si un proceso ya ha comenzado a ejecutarse
     
     // Matriz para almacenar el diagrama de Gantt
-    char gantt[100][100]; // Asumimos un máximo de 100 procesos y 100 unidades de tiempo
+    char gantt[100][100]; // Asumimos un maximo de 100 procesos y 100 unidades de tiempo
 
     // Inicializar la matriz con espacios en blanco
     for (int i = 0; i < n; i++) {
@@ -185,10 +185,10 @@ void RoundRobin(Proceso procesos[], int n) {
         }
     }
 
-    // Inicializar los tiempos de ráfaga restantes y el estado de inicio de los procesos
+    // Inicializar los tiempos de rafaga restantes y el estado de inicio de los procesos
     for (int i = 0; i < n; i++) {
         tiemposRafagaRestantes[i] = procesos[i].tiempoRafaga;
-        procesoIniciado[i] = false; // Ningún proceso ha comenzado
+        procesoIniciado[i] = false; // Ningun proceso ha comenzado
     }
 
     // Bucle principal: ejecutar hasta que todos los procesos hayan terminado
@@ -197,7 +197,7 @@ void RoundRobin(Proceso procesos[], int n) {
 
         // Iterar sobre todos los procesos
         for (int i = 0; i < n; i++) {
-            // Verificar si el proceso está listo para ejecutarse
+            // Verificar si el proceso esta listo para ejecutarse
             if (procesos[i].tiempoLlegada <= tiempoActual && tiemposRafagaRestantes[i] > 0) {
                 procesoEjecutado = true;
 
@@ -222,12 +222,12 @@ void RoundRobin(Proceso procesos[], int n) {
             }
         }
 
-        // Si no se ejecutó ningún proceso en este ciclo, avanzar el tiempo
+        // Si no se ejecuto ningun proceso en este ciclo, avanzar el tiempo
         if (!procesoEjecutado) {
             tiempoActual++;
         }
     }
-    // Mostrar la línea de tiempo
+    // Mostrar la linea de tiempo
     cout << "Tiempo:  ";
     for (int j = 0; j < tiempoActual + 1; j++) {
         cout << j << "  ";
@@ -244,7 +244,7 @@ void RoundRobin(Proceso procesos[], int n) {
     }
 }
 
-// Función para calcular el tiempo de espera y finalización en SPN (Shortest Process Next)
+// Funcion para calcular el tiempo de espera y finalizacion en SPN (Shortest Process Next)
 void SPN(Proceso procesos[], int n) {
     int tiempoActual = 0;
     int completados = 0;
@@ -263,7 +263,7 @@ void SPN(Proceso procesos[], int n) {
         int idx = -1;
         int menorRafaga = 999999;
 
-        // Buscar el proceso con la menor ráfaga que esté listo para ejecutarse
+        // Buscar el proceso con la menor rafaga que esta listo para ejecutarse
         for (int i = 0; i < n; i++) {
             if (procesos[i].tiempoLlegada <= tiempoActual && procesos[i].tiempoRafagaRestante > 0) {
                 if (procesos[i].tiempoRafagaRestante < menorRafaga) {
@@ -297,7 +297,7 @@ void SPN(Proceso procesos[], int n) {
         }
     }
 
-    // Mostrar la línea de tiempo
+    // Mostrar la linea de tiempo
     cout << "Tiempo:  ";
     for (int j = 0; j < tiempoActual + 1; j++) {
         cout << j << "  ";
@@ -315,7 +315,7 @@ void SPN(Proceso procesos[], int n) {
 }
 
 
-// Función para calcular el tiempo de espera y finalización en Retroalimentación (Multilevel Feedback Queue)
+// Funcion para calcular el tiempo de espera y finalizacion en Retroalimentacion (Multilevel Feedback Queue)
 void Realimentacion(Proceso procesos[], int n) {
     int tiempoActual = 0;
     int completados = 0;
@@ -326,7 +326,7 @@ void Realimentacion(Proceso procesos[], int n) {
     // Inicializar los tiempos de ráfaga restantes y el estado de inicio de los procesos
     for (int i = 0; i < n; i++) {
         tiemposRafagaRestantes[i] = procesos[i].tiempoRafaga;
-        procesoIniciado[i] = false; // Ningún proceso ha comenzado
+        procesoIniciado[i] = false; // Ningun proceso ha comenzado
         procesos[i].numPrioridades = 0; // Inicializar el contador de prioridades
     }
 
@@ -351,7 +351,7 @@ void Realimentacion(Proceso procesos[], int n) {
                 contadorInicios++;
                 procesoIniciado[i] = true;
                 procesos[i].inicio = tiempoActual + 1;
-                cout << "Contador de inicios aumentó a: " << contadorInicios << endl;
+                cout << "Contador de inicios aumento a: " << contadorInicios << endl;
             }
         }
 
@@ -368,11 +368,11 @@ void Realimentacion(Proceso procesos[], int n) {
             }
         }
 
-        // Si se encontró un proceso listo, ejecutarlo
+        // Si se encontro un proceso listo, ejecutarlo
         if (idx != -1) {
             procesoEjecutado = true;
 
-            // Verificar cuántos procesos están listos para ejecutarse
+            // Verificar cuantos procesos estan listos para ejecutarse
             int procesosListos = 0;
             for (int i = 0; i < n; i++) {
                 if (procesos[i].tiempoLlegada < tiempoActual && tiemposRafagaRestantes[i] > 0) {
@@ -380,7 +380,7 @@ void Realimentacion(Proceso procesos[], int n) {
                 }
             }
 
-            // Incrementar el número de prioridades solo si hay más de un proceso listo
+            // Incrementar el numero de prioridades solo si hay mas de un proceso listo
             if (procesosListos < contadorInicios) {
                 procesos[idx].numPrioridades++;
                 cout << "Proceso " << procesos[idx].id << " tiene ahora " << procesos[idx].numPrioridades << " prioridades." << endl;
@@ -401,7 +401,7 @@ void Realimentacion(Proceso procesos[], int n) {
             }
         }
 
-        // Si no se ejecutó ningún proceso en este ciclo, avanzar el tiempo
+        // Si no se ejecuto ningun proceso en este ciclo, avanzar el tiempo
         if (!procesoEjecutado) {
             tiempoActual++;
         }
@@ -434,7 +434,7 @@ void Realimentacion(Proceso procesos[], int n) {
     }
 }
 
-// Función para mostrar los resultados
+// Funcion para mostrar los resultados
 void mostrarProcesos(Proceso procesos[], int n) {
     cout << "Proceso\tInicio\tTiempo de espera\tFinalizacion\tTiempo de retorno\tTiempo de llegada" << endl;
     for (int i = 0; i < n; i++) {
@@ -445,7 +445,7 @@ void mostrarProcesos(Proceso procesos[], int n) {
 
 int main() {
     int n;
-    Proceso procesos[100]; // Máximo 100 procesos
+    Proceso procesos[100]; // Maximo 100 procesos
     Proceso procesosOriginal[100]; // Copia de los procesos originales
     bool continuar = true;
 
