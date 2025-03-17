@@ -170,16 +170,22 @@ void HRRN(Proceso procesos[], int n) {
 void RoundRobin(Proceso procesos[], int n) {
     int tiempoActual = 0;
     int completados = 0;
-    int tiemposRafagaRestantes[n];
-    bool procesoIniciado[n]; // Para registrar si el proceso ya ha comenzado
+    int tiemposRafagaRestantes[n]; // Tiempo de ráfaga restante para cada proceso
+    bool procesoIniciado[n];      // Indica si un proceso ya ha comenzado a ejecutarse
+
+    // Inicializar los tiempos de ráfaga restantes y el estado de inicio de los procesos
     for (int i = 0; i < n; i++) {
         tiemposRafagaRestantes[i] = procesos[i].tiempoRafaga;
-        procesoIniciado[i] = false; // Inicialmente, ningún proceso ha comenzado
+        procesoIniciado[i] = false; // Ningún proceso ha comenzado
     }
 
+    // Bucle principal: ejecutar hasta que todos los procesos hayan terminado
     while (completados < n) {
         bool procesoEjecutado = false;
+
+        // Iterar sobre todos los procesos
         for (int i = 0; i < n; i++) {
+            // Verificar si el proceso está listo para ejecutarse
             if (procesos[i].tiempoLlegada <= tiempoActual && tiemposRafagaRestantes[i] > 0) {
                 procesoEjecutado = true;
 
@@ -189,19 +195,21 @@ void RoundRobin(Proceso procesos[], int n) {
                     procesoIniciado[i] = true;
                 }
 
-                // Ejecutar el proceso por un quantum de 1
-                int tiempoEjecucion = min(1, tiemposRafagaRestantes[i]);
-                tiemposRafagaRestantes[i] -= tiempoEjecucion;
-                tiempoActual += tiempoEjecucion;
+                // Ejecutar el proceso por un quantum de 1 unidad de tiempo
+                tiemposRafagaRestantes[i]--;
+                tiempoActual++;
 
+                // Si el proceso ha terminado, calcular sus tiempos
                 if (tiemposRafagaRestantes[i] == 0) {
                     completados++;
                     procesos[i].tiempoFinalizacion = tiempoActual;
-                    procesos[i].tiempoEspera = procesos[i].tiempoFinalizacion - procesos[i].tiempoLlegada - procesos[i].tiempoRafaga;
                     procesos[i].tiempoRetorno = procesos[i].tiempoFinalizacion - procesos[i].tiempoLlegada;
+                    procesos[i].tiempoEspera = procesos[i].tiempoFinalizacion - procesos[i].tiempoLlegada - procesos[i].tiempoRafaga;
                 }
             }
         }
+
+        // Si no se ejecutó ningún proceso en este ciclo, avanzar el tiempo
         if (!procesoEjecutado) {
             tiempoActual++;
         }
